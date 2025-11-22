@@ -5,7 +5,12 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'primary': ['Cormorant Infant'],
+        'secondary': ['Poppins'],
+      },
+    },
   },
   plugins: [],
 };
