@@ -20,12 +20,12 @@ export default function Navigation() {
               <span className="text-2xl text-gray-800" style={{ fontFamily: "'Cormorant Infant', serif" }}>Blog collaboratif</span>
             </div>
 
-            {/* Navigation Links */}
+            {/* Navigation Links
             <div className="hidden md:flex space-x-12">
               <a href="#" className="text-blue-600 font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>Home</a>
               <a href="#" className="text-gray-700 hover:text-blue-600" style={{ fontFamily: "'Poppins', sans-serif" }}>Categories</a>
               <a href="#" className="text-gray-700 hover:text-blue-600" style={{ fontFamily: "'Poppins', sans-serif" }}>Events</a>
-            </div>
+            </div> */}
 
             {/* Auth Buttons */}
             <div className="flex items-center space-x-3">
