@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
+import commentReducer from './features/Comment/CommentSlice'
 
 export const store = configureStore({
   reducer: {
-    // your slices
+    comment: commentReducer,
   }
 })
 

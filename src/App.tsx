@@ -9,6 +9,8 @@ import EventPage from './pages/EventPage'
 import ProfileDetails from './pages/ProfileDetails'
 
 
+import TestComments from './pages/TestComments'
+
 // src/App.tsx
 export default function App() {
   return (
@@ -19,6 +21,7 @@ export default function App() {
         <Route path="/category" element={<CategoryPage />} />
         <Route path="/event" element={<EventPage />} />
         <Route path="/profile" element={<ProfileDetails />} />
+        <Route path="/test-comments" element={<TestComments />} />
       </Routes>
     </Router>
   )
