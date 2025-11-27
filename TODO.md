@@ -1,0 +1,2 @@
+- [ ] Update ProfileDetails.tsx: Add profilePicture state, handleProfilePictureChange, define allCategories, remove old expertise props, update ProfileMainContent props
+- [ ] Update ProfileMainContent.tsx: Update props interface, add file input for PFP, change expertise to multi-select dropdown, update tags handling
