@@ -1,8 +1,8 @@
 import AuthNav from "../components/AuthNavigation";
-import Slider from "../components/Category/Slider";
-import AllCategories from "../components/Category/AllCategories";
+import Slider from "../features/Category/Slider";
+import AllCategories from "../features/Category/AllCategories";
 import Footer from "../components/landing/Footer";
-import SearchBar from "../components/Category/SearchBar";
+
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -116,10 +116,10 @@ export default function CategoryPage() {
       {/* SLIDER */}
       <Slider items={sliderItems} />
 
-      {/* SEARCHBAR */}
+      {/* SEARCHBAR
       <div className="w-full flex justify-center mt-6 mb-4">
         <SearchBar />
-      </div>
+      </div> */}
 
       {/* ALL CATEGORIES */}
       <div id="all-categories">

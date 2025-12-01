@@ -2,7 +2,7 @@
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import SearchBar from "./Category/SearchBar";
+
 
 export default function AuthNav() {
     const navigate = useNavigate();
