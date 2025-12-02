@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -104,6 +106,13 @@ const Login = () => {
                 className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg"
               >
                 Login
+              </button>
+
+              <button
+                onClick={() => navigate('/admin')}
+                className="bg-gray-800 text-white font-bold py-2 px-8 rounded-xl hover:bg-gray-700 transition-colors shadow-lg text-sm"
+              >
+                Admin (Temp)
               </button>
 
               <div className="flex flex-col items-center space-y-1">

@@ -14,6 +14,12 @@ import ForgetPassword from './pages/ForgetPassword';
 import ArticlePage from './pages/ArticlePage';
 import CommentsPage from './pages/CommentsPage';
 
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UsersPage from './pages/admin/UsersPage';
+import ArticlesPage from './pages/admin/ArticlesPage';
+import AdminCommentsPage from './pages/admin/CommentsPage';
+
 export default function App() {
   return (
     <Router>
@@ -30,6 +36,14 @@ export default function App() {
         <Route path="/forgetPassword" element={<ForgetPassword />} />
         <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/comments/:articleId" element={<CommentsPage />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="articles" element={<ArticlesPage />} />
+          <Route path="comments" element={<AdminCommentsPage />} />
+        </Route>
       </Routes>
     </Router>
   )
