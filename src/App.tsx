@@ -5,11 +5,21 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import BlogLanding from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 import CategoryPage from './pages/CategoryPage'
-import EventPage from './pages/EventPage'
 import ProfileDetails from './pages/ProfileDetails'
 
 
 import TestComments from './pages/TestComments'
+import Home from './features/Events/pages/Home';
+import Events from './features/Events/pages/Events';
+import EventDetail from './features/Events/pages/EventDetail';
+import AddEvent from './features/Events/pages/AddEvent';
+import EditEvent from './features/Events/pages/EditEvent';
+import Calendar from './features/Events/pages/Calendar';
+import Search from './features/Events/pages/Search';
+import Users from './features/Events/pages/Users';
+import Stats from './features/Events/pages/Stats';
+import NotFound from './features/Events/pages/NotFound';
+import AuthorProfile from './features/Events/pages/AuthorProfile';
 
 // src/App.tsx
 export default function App() {
@@ -19,10 +29,22 @@ export default function App() {
         <Route path="/" element={<BlogLanding />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/category" element={<CategoryPage />} />
-        <Route path="/event" element={<EventPage />} />
         <Route path="/profile" element={<ProfileDetails />} />
         <Route path="/test-comments" element={<TestComments />} />
+
+        <Route path="/event" element={<Home />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/:id" element={<EventDetail />} />
+        <Route path="/add-event" element={<AddEvent />} />
+        <Route path="/edit-event/:id" element={<EditEvent />} />
+        <Route path="/author/:authorId" element={<AuthorProfile />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
+
     </Router>
   )
 }
