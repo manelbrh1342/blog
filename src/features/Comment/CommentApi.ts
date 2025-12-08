@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.1.4:5000/api/comments";
+const BASE_URL = `http://192.168.38.68:5000/api/comments`;
 
 /**
  * Fetch comments for a specific post
