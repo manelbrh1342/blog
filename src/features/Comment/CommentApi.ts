@@ -1,38 +1,61 @@
-const BASE_URL = `http://192.168.38.68:5000/api/comments`;
+export const commentApi = createApi({
+  reducerPath: 'commentApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000/api' }),
+  endpoints: (builder) => ({
+    getComments: builder.query({
+      query: (postId) => `/comments/?post_id=${postId}`,
+    }),
+    addComment: builder.mutation({
+      query: (comment) => ({
+        url: '/comments',
+        method: 'POST',
+        body: comment,
+      }),
+    }),
+    updateComment: builder.mutation({
+      query: ({ id, ...comment }) => ({
+        url: `/comments/${id}`,
+        method: 'PUT',
+        body: comment,
+      }),
+    }),
+  }),
+});
 
-/**
- * Fetch comments for a specific post
- */
-export const fetchCommentsByPostId = async (postId: number) => {
-  const response = await fetch(`${BASE_URL}/?post_id=${postId}`);
+export const {
+  useGetCommentsQuery,
+  useAddCommentMutation,
+  useUpdateCommentMutation,
+} = commentApi;
+=======
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch comments");
-  }
+export const commentApi = createApi({
+  reducerPath: 'commentApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5001/api' }),
+  endpoints: (builder) => ({
+    getComments: builder.query({
+      query: (postId) => `/comments/?post_id=${postId}`,
+    }),
+    addComment: builder.mutation({
+      query: (comment) => ({
+        url: '/comments',
+        method: 'POST',
+        body: comment,
+      }),
+    }),
+    updateComment: builder.mutation({
+      query: ({ id, ...comment }) => ({
+        url: `/comments/${id}`,
+        method: 'PUT',
+        body: comment,
+      }),
+    }),
+  }),
+});
 
-  return response.json(); // returns the array exactly like your backend sends
-};
-
-/**
- * Add a new comment
- */
-export const addComment = async (commentData: {
-  post_id: number;
-  content: string;
-  user_id: number;
-  parent_id?: number | null;
-}) => {
-  const response = await fetch(`${BASE_URL}/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(commentData),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to add comment");
-  }
-
-  return response.json(); // returns the newly created comment
-};
+export const {
+  useGetCommentsQuery,
+  useAddCommentMutation,
+  useUpdateCommentMutation,
+} = commentApi;

@@ -5,7 +5,6 @@ import BlogLanding from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 import CategoryPage from './pages/CategoryPage'
 import ProfileDetails from './pages/ProfileDetails'
-import TestComments from './pages/TestComments'
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -19,7 +18,6 @@ import UsersPage from './pages/admin/UsersPage';
 import ArticlesPage from './pages/admin/ArticlesPage';
 import AdminCommentsPage from './pages/admin/CommentsPage';
 
-import TestComments from './pages/TestComments'
 import Home from './features/Events/pages/Home';
 import Events from './features/Events/pages/Events';
 import EventDetail from './features/Events/pages/EventDetail';
