@@ -39,7 +39,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/category" element={<CategoryPage />} />
         <Route path="/profile" element={<ProfileDetails />} />
-        <Route path="/test-comments" element={<TestComments />} />
+        <Route path="/test-comments" element={<CommentsPage />} />
 
         <Route path="/event" element={<Home />} />
         <Route path="/events" element={<Events />} />

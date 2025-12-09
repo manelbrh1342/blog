@@ -6,7 +6,7 @@ import CommentItem from "../features/Article/components/CommantItems";
 // import { addComment } from "../features/Comment/CommentApi";
 
 const CommentsPage: React.FC = () => {
-    const { articleId } = useParams<{ articleId: string }>();
+    const { articleId } = useParams<{ articleId?: string }>();
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState("");
 

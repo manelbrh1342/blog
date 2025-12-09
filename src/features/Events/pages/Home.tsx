@@ -30,10 +30,10 @@ const Home: React.FC = () => {
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Search:', searchQuery, selectedCategory);
+    console.log('Search:', searchQuery);
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="flex justify-center items-center min-h-screen"><div className="text-xl">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-[#F2F4F8] font-sans">
@@ -54,9 +54,9 @@ const Home: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Filter Tabs - Only All Events */}
-        <div className="filter-tabs">
-          <div className="filter-tab active">
-            All Events
+        <div className="flex justify-center mb-8">
+          <div className="bg-white px-6 py-3 rounded-full shadow-sm border border-gray-200">
+            <span className="text-gray-800 font-medium">All Events</span>
           </div>
         </div>
 
