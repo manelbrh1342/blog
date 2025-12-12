@@ -1,26 +1,55 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signupUser } from "../features/Auth/AuthApi";
+import { loginSuccess } from "../features/Auth/AuthSlice";
 
 const Signup = () => {
-  // State hooks for form inputs
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Handler for form submission
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Basic validation example
+    
     if (!email || !username || !password || !confirmPass) {
-      alert("Please fill in all fields.");
+      setError("Please fill in all fields.");
       return;
     }
     if (password !== confirmPass) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
-    // Placeholder for actual signup action
-    alert(`Signing up user:\nEmail: ${email}\nUsername: ${username}`);
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await signupUser({ email, username, password });
+      
+      // Store token and user info
+      dispatch(loginSuccess({ 
+        token: data.token, 
+        user: { username, email, id: data.user?.id } 
+      }));
+      
+      // Navigate to home
+      navigate("/home");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Signup failed";
+      setError(errorMessage);
+      console.error("Error during signup:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,6 +79,12 @@ const Signup = () => {
       >
         <div className="w-full max-w-md px-8 flex flex-col items-center">
           <h2 className="text-5xl text-white font-primary mb-8 tracking-wide">SIGNUP</h2>
+
+          {error && (
+            <div className="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="w-full space-y-4">
             <div className="flex flex-col space-y-1">
@@ -115,9 +150,10 @@ const Signup = () => {
             <div className="flex flex-col items-center space-y-4 mt-6">
               <button
                 type="submit"
-                className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg"
+                disabled={loading}
+                className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                SignUp
+                {loading ? "Signing up..." : "SignUp"}
               </button>
 
               <div className="flex flex-col items-center space-y-1">

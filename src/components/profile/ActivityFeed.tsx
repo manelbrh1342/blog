@@ -1,87 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
 
 export default function ActivityFeed() {
-  const activities = [
-    {
-      id: 1,
-      user: 'Cameron Williamson',
-      userAvatar: 'https://i.pravatar.cc/150?img=12',
-      action: 'published a new article',
-      title: 'The Art of Minimalist Living: Finding Joy in Less',
-      time: '2 hours ago',
-      image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop',
-      excerpt: 'Discover how embracing minimalism can transform your life and bring you closer to what truly matters...',
-      likes: 234,
-      comments: 45,
-      shares: 12
-    },
-    {
-      id: 2,
-      user: 'Esther Howard',
-      userAvatar: 'https://i.pravatar.cc/150?img=25',
-      action: 'liked your article',
-      title: 'Italy: Where Every Street Feels Like a Story',
-      time: '5 hours ago',
-      likes: 892,
-      comments: 167,
-      shares: 43
-    },
-    {
-      id: 3,
-      user: 'Wade Warren',
-      userAvatar: 'https://i.pravatar.cc/150?img=15',
-      action: 'commented on',
-      title: 'Tech Trends 2025: What to Expect',
-      time: '8 hours ago',
-      comment: 'This is exactly what I was looking for! Great insights on AI development and future predictions.',
-      likes: 456,
-      comments: 89,
-      shares: 23
-    },
-    {
-      id: 4,
-      user: 'Jenny Wilson',
-      userAvatar: 'https://i.pravatar.cc/150?img=32',
-      action: 'shared your article',
-      title: 'The Ultimate Guide to Remote Work Productivity',
-      time: '1 day ago',
-      likes: 678,
-      comments: 134,
-      shares: 67
-    },
-    {
-      id: 5,
-      user: 'Robert Fox',
-      userAvatar: 'https://i.pravatar.cc/150?img=18',
-      action: 'published a new article',
-      title: 'Sustainable Fashion: Making Conscious Choices',
-      time: '1 day ago',
-      image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop',
-      excerpt: 'Learn how to build a sustainable wardrobe that reflects your values while staying stylish and timeless...',
-      likes: 543,
-      comments: 98,
-      shares: 31
-    },
-    {
-      id: 6,
-      user: 'Kristin Watson',
-      userAvatar: 'https://i.pravatar.cc/150?img=28',
-      action: 'started following you',
-      time: '2 days ago'
-    },
-    {
-      id: 7,
-      user: 'Jacob Jones',
-      userAvatar: 'https://i.pravatar.cc/150?img=22',
-      action: 'added you as a collaborator',
-      title: 'Building Better Communities Through Design',
-      time: '3 days ago',
-      likes: 321,
-      comments: 67,
-      shares: 19
-    }
-  ];
+  const [activities, setActivities] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const { fetchArticles } = await import('../../features/Article/ArticleApi');
+        const articles = await fetchArticles({ status: 'published' });
+        
+        const acts = articles.slice(0, 10).map((post) => ({
+          id: post.id,
+          user: post.author_name || `User ${post.author_id || 'Unknown'}`,
+          userAvatar: post.author_avatar || `https://i.pravatar.cc/150?img=${post.author_id || 1}`,
+          action: "published a new article",
+          title: post.title,
+          time: post.date,
+          image: post.featured_image || post.image,
+          excerpt: post.excerpt || post.content.substring(0, 100) + '...',
+          likes: 0,
+          comments: 0,
+          shares: 0,
+          slug: post.slug
+        }));
+        setActivities(acts);
+      } catch (err) {
+        console.error("Error fetching activities:", err);
+      }
+    };
+
+    fetchActivities();
+  }, []);
 
   return (
     <main className="flex-1 p-8 text-center">

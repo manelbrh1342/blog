@@ -62,7 +62,7 @@ export default function App() {
 // ...
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgetPassword" element={<ForgetPassword />} />
-          <Route path="/article/:id" element={<ArticlePage />} />
+          <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/comments/:articleId" element={<CommentsPage />} />
 
           {/* Admin Routes */}

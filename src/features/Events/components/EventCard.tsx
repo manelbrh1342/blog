@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, Star, Edit, Trash2, Share2 } from 'lucide-react';
+import type { Event } from '../EventApi';
 
-interface Event {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  authorId: string;
-  category: string;
-  date: string;
-  likes: number;
-  favorites: number;
-  views: number;
+// Extended interface for display purposes
+interface DisplayEvent extends Event {
+  author?: string;
+  authorId?: string;
+  category?: string;
+  likes?: number;
+  favorites?: number;
+  views?: number;
   image?: string;
 }
 
 interface EventCardProps {
-  event: Event;
+  event: DisplayEvent;
   onLike?: (id: number) => void;
   onFavorite?: (id: number) => void;
   variant?: 'vertical' | 'horizontal';
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, variant = 'vertical' }) => {
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      }).toUpperCase();
+    } catch {
+      return dateString;
+    }
+  };
+
+  const displayDate = event.date ? formatDate(event.date) : 'Date TBD';
+  const displayContent = event.description || event.title;
+  const displayAuthor = event.author || `Organizer ${event.organizer_id || 'Unknown'}`;
+  const displayAuthorId = event.authorId || `organizer-${event.organizer_id || 'unknown'}`;
+  const displayLikes = event.likes || 0;
+  const displayFavorites = event.favorites || 0;
+  const displayViews = event.views || 0;
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -115,23 +134,23 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
             </div>
 
             <div className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider">
-              {event.date}
+              {displayDate}
             </div>
 
             <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
-              {event.content}
+              {displayContent}
             </p>
           </div>
 
           {/* Footer with Author and Stats */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-            <Link to={`/author/${event.authorId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link to={`/author/${displayAuthorId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E6A8D7] to-[#D882C2] flex items-center justify-center text-white font-bold shadow-md">
-                {event.author.charAt(0).toUpperCase()}
+                {displayAuthor.charAt(0).toUpperCase()}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-gray-900">{event.author}</span>
-                <span className="text-xs text-gray-500">Author</span>
+                <span className="text-sm font-bold text-gray-900">{displayAuthor}</span>
+                <span className="text-xs text-gray-500">Organizer</span>
               </div>
             </Link>
 
@@ -144,7 +163,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
                 title="Like"
               >
                 <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                <span className="text-sm font-medium">{event.likes + (isLiked ? 1 : 0)}</span>
+                <span className="text-sm font-medium">{displayLikes + (isLiked ? 1 : 0)}</span>
               </button>
 
               <button
@@ -154,12 +173,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
                 title="Favorites"
               >
                 <Star className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
-                <span className="text-sm font-medium">{event.favorites + (isFavorited ? 1 : 0)}</span>
+                <span className="text-sm font-medium">{displayFavorites + (isFavorited ? 1 : 0)}</span>
               </button>
 
               <div className="flex items-center gap-1.5 text-gray-600">
                 <Eye className="w-5 h-5" />
-                <span className="text-sm font-medium">{event.views}</span>
+                <span className="text-sm font-medium">{displayViews}</span>
               </div>
 
               {/* Share Button */}
@@ -251,22 +270,22 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
         </h3>
 
         <div className="text-xs font-medium text-gray-400 mb-4 uppercase tracking-wider">
-          {event.date}
+          {displayDate}
         </div>
 
         <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
-          {event.content}
+          {displayContent}
         </p>
 
         {/* Footer with Author and Stats */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
-          <Link to={`/author/${event.authorId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Link to={`/author/${displayAuthorId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E6A8D7] to-[#D882C2] flex items-center justify-center text-white font-bold shadow-md">
-              {event.author.charAt(0).toUpperCase()}
+              {displayAuthor.charAt(0).toUpperCase()}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-gray-900">{event.author}</span>
-              <span className="text-xs text-gray-500">Author</span>
+              <span className="text-sm font-bold text-gray-900">{displayAuthor}</span>
+              <span className="text-xs text-gray-500">Organizer</span>
             </div>
           </Link>
 
@@ -279,7 +298,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
               title="Like"
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-              <span className="text-xs font-medium">{event.likes + (isLiked ? 1 : 0)}</span>
+              <span className="text-xs font-medium">{displayLikes + (isLiked ? 1 : 0)}</span>
             </button>
 
             <button
@@ -289,12 +308,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
               title="Favorites"
             >
               <Star className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
-              <span className="text-xs font-medium">{event.favorites + (isFavorited ? 1 : 0)}</span>
+              <span className="text-xs font-medium">{displayFavorites + (isFavorited ? 1 : 0)}</span>
             </button>
 
             <div className="flex items-center gap-1 text-gray-600">
               <Eye className="w-4 h-4" />
-              <span className="text-xs font-medium">{event.views}</span>
+              <span className="text-xs font-medium">{displayViews}</span>
             </div>
 
             {/* Share Button */}

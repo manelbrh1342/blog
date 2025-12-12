@@ -1,92 +1,64 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../store";
-import { type Article } from "../features/Article/ArticleApi";
+import { useDispatch } from "react-redux";
+import { type Article, fetchArticleBySlug, fetchRelatedArticles } from "../features/Article/ArticleApi";
 import { setCurrentArticle, setRelatedArticles } from "../features/Article/ArticleSlice";
 import AuthNav from "../components/AuthNavigation";
 import Comments from "../features/Article/components/Comments";
 import ArticleCard from "../features/Article/components/ArticleCard";
 import Footer from "../components/landing/Footer";
+import { Link } from "react-router-dom";
 
 const ArticlePage: React.FC = () => {
-  // const { id } = useParams<{ id: string }>(); // Unused for dummy data
-  // const articleId = Number(id); // Unused for dummy data
+  const { slug } = useParams<{ slug: string }>();
   const dispatch = useDispatch();
-  const { currentArticle, relatedArticles } = useSelector(
-    (state: RootState) => state.article
-  );
+  const [currentArticle, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelated] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Dummy data for testing
-    const dummyArticle: Article = {
-      id: 1,
-      title: "President Trump's foreign policy toward the Middle East",
-      content: `It was only hours after US President-elect Donald Trump announced his intention to nominate former Arkansas Governor Mike Huckabee to be US Ambassador to Israel. Huckabee is known for his unparalleled support for settlements, especially in the West Bank, which he considers part.
+    if (!slug) return;
 
-      Following Trump's announcement, extremist Israeli minister Smotrich tweeted on X, saying, "2025 will be the year of Israeli sovereignty over Judea and Samaria," the name Israel uses for the West Bank. He stated that he had instructed the Settlement Authority and the Civil Administration (both subordinate to the Ministry of Defense) to begin preparing the necessary infrastructure to implement "sovereignty over the West Bank.
+    const fetchArticle = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const article = await fetchArticleBySlug(slug);
+        setArticle(article);
+        dispatch(setCurrentArticle(article));
 
-      This has led us to question the contours of the new foreign policy of the incoming Trump administration, particularly toward the Middle East, which is the focus of global conflict today. While Trump boasts of his unique leadership style, his choices for his cabinet team reveal the potential for more aggressive and hostile policies toward hot-button issues, particularly those related to the Palestinian issue and relations with Iran.
-
-      In this article, we will examine the most prominent figures Trump has chosen to lead the United States. We will focus on the most prominent positions these figures have taken on regional issues, in an attempt to understand the future shape of foreign policy based on this.`,
-      author_name: "Cameron Williamson",
-      author_avatar: "https://i.pravatar.cc/150?u=cameron",
-      date: "17 November 2024",
-      category: "Politics",
-      image: "https://picsum.photos/800/400",
+        // Fetch related articles by category
+        if (article.category_id) {
+          const related = await fetchRelatedArticles(article.category_id);
+          const filtered = related.filter(a => a.id !== article.id).slice(0, 3);
+          setRelated(filtered);
+          dispatch(setRelatedArticles(filtered));
+        }
+      } catch (err) {
+        console.error("Failed to fetch article", err);
+        setError(err instanceof Error ? err.message : "Failed to load article");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const dummyRelated: Article[] = [
-      {
-        id: 2,
-        title: "Consequat",
-        content: "Minim dolor in amet nulla laboris enim dolore consequat proident fugiat culpa eiusmod.",
-        author_name: "Cameron Williamson",
-        author_avatar: "https://i.pravatar.cc/150?u=cameron",
-        date: "16 January 2017",
-        category: "Politics",
-        image: "https://picsum.photos/400/200?random=1",
-      },
-      {
-        id: 3,
-        title: "Consequat",
-        content: "Minim dolor in amet nulla laboris enim dolore consequat proident fugiat culpa eiusmod.",
-        author_name: "Cameron Williamson",
-        author_avatar: "https://i.pravatar.cc/150?u=cameron",
-        date: "16 January 2017",
-        category: "Politics",
-        image: "https://picsum.photos/400/200?random=2",
-      },
-      {
-        id: 4,
-        title: "Consequat",
-        content: "Minim dolor in amet nulla laboris enim dolore consequat proident fugiat culpa eiusmod.",
-        author_name: "Cameron Williamson",
-        author_avatar: "https://i.pravatar.cc/150?u=cameron",
-        date: "16 January 2017",
-        category: "Politics",
-        image: "https://picsum.photos/400/200?random=3",
-      },
-      {
-        id: 5,
-        title: "Consequat",
-        content: "Minim dolor in amet nulla laboris enim dolore consequat proident fugiat culpa eiusmod.",
-        author_name: "Cameron Williamson",
-        author_avatar: "https://i.pravatar.cc/150?u=cameron",
-        date: "16 January 2017",
-        category: "Politics",
-        image: "https://picsum.photos/400/200?random=4",
-      },
-    ];
+    fetchArticle();
+  }, [slug, dispatch]);
 
-    dispatch(setCurrentArticle(dummyArticle));
-    dispatch(setRelatedArticles(dummyRelated));
-  }, [dispatch]);
-
-  if (!currentArticle) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-xl">Chargement de l'article...</div>
+        <div className="text-xl">Loading article...</div>
+      </div>
+    );
+  }
+
+  if (error || !currentArticle) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64">
+        <div className="text-xl text-red-600">{error || "Article not found"}</div>
+        <Link to="/home" className="mt-4 text-blue-600 hover:underline">Back to Home</Link>
       </div>
     );
   }
@@ -100,11 +72,8 @@ const ArticlePage: React.FC = () => {
           {/* Main Content - Left Column */}
           <div className="lg:col-span-2 flex flex-col gap-8">
             <div>
-              <p className="text-[#004aad] font-primary font-bold text-4xl mb-6 text-left">
-                {currentArticle.category}
-              </p>
               <img
-                src={currentArticle.image ?? ''}
+                src={currentArticle.image || currentArticle.featured_image || "https://picsum.photos/800/400"}
                 alt={currentArticle.title}
                 className="w-full h-[400px] object-cover rounded-2xl mb-6"
               />
@@ -113,14 +82,9 @@ const ArticlePage: React.FC = () => {
               </h1>
               <p className="text-gray-400 text-left text-sm mb-6">{currentArticle.date}</p>
 
-              <div className="flex items-center gap-3 mb-8">
-                <img
-                  src={currentArticle.author_avatar ?? ''}
-                  alt={currentArticle.author_name ?? ''}
-                  className="w-10 h-10 rounded-full"
-                />
-                <span className="font-medium text-gray-900">{currentArticle.author_name}</span>
-              </div>
+              {currentArticle.excerpt && (
+                <p className="text-gray-600 text-lg mb-6 italic">{currentArticle.excerpt}</p>
+              )}
 
               <div className="prose max-w-none text-left text-gray-700 leading-relaxed whitespace-pre-line font-secondary">
                 {currentArticle.content}
@@ -133,25 +97,25 @@ const ArticlePage: React.FC = () => {
           {/* Sidebar - Right Column */}
           <div className="flex flex-col gap-8">
             <div className="flex justify-between items-center">
-              <h2 className="text-[#004aad] font-primary font-bold text-3xl">Related News</h2>
-              <a href="#" className="text-[#004aad] text-sm hover:underline">See All</a>
+              <h2 className="text-[#004aad] font-primary font-bold text-3xl">Related Articles</h2>
             </div>
 
             <div className="flex flex-col gap-6">
               {relatedArticles.length > 0 ? (
                 relatedArticles.map((article: Article) => (
-                  <ArticleCard
-                    key={article.id}
-                    title={article.title}
-                    image={article.image ?? ''}
-                    author={article.author_name ?? ''}
-                    date={article.date}
-                    content={article.content}
-                    avatar={article.author_avatar ?? ''}
-                  />
+                  <Link key={article.id} to={`/article/${article.slug}`}>
+                    <ArticleCard
+                      title={article.title}
+                      image={article.image || article.featured_image || ''}
+                      author={article.author_name || 'Unknown'}
+                      date={article.date}
+                      content={article.excerpt || article.content.substring(0, 100) + '...'}
+                      avatar={article.author_avatar || 'https://i.pravatar.cc/150?u=1'}
+                    />
+                  </Link>
                 ))
               ) : (
-                <div className="text-gray-500">Aucun article similaire trouvé</div>
+                <div className="text-gray-500">No related articles found</div>
               )}
             </div>
           </div>

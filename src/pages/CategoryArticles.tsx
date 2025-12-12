@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import type { RootState } from "../store";
+import { fetchCategoryBySlug, fetchCategories } from "../features/Category/CategoryApi";
+import { fetchArticles } from "../features/Article/ArticleApi";
+import type { Article } from "../features/Article/ArticleApi";
 import ArticleCard from "../features/Article/components/ArticleCard";
 import AuthNav from "../components/AuthNavigation";
 import Footer from "../components/landing/Footer";
@@ -11,29 +12,65 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const CategoryArticles = () => {
     const { categorySlug } = useParams<{ categorySlug: string }>();
-    const { articles } = useSelector((state: RootState) => state.article);
-    const [filteredArticles, setFilteredArticles] = useState(articles);
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [categoryName, setCategoryName] = useState<string>("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (categorySlug) {
-            // Filter by category. 
-            // Note: This relies on article.category string matching the slug or logic.
-            // If your article categories are "Travel & Adventure" vs slug "travel",
-            // you might need smarter matching. For now, simple includes/match.
-            const slugLower = categorySlug.toLowerCase();
+        const fetchData = async () => {
+            if (!categorySlug) return;
+            
+            try {
+                setLoading(true);
+                setError(null);
+                
+                // Fetch category to get ID
+                const category = await fetchCategoryBySlug(categorySlug);
+                setCategoryName(category.name);
+                
+                // Fetch articles for this category
+                const categoryArticles = await fetchArticles({ 
+                    category_id: category.id,
+                    status: 'published' 
+                });
+                
+                setArticles(categoryArticles);
+            } catch (err) {
+                console.error("Error fetching category articles:", err);
+                setError(err instanceof Error ? err.message : "Failed to load articles");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            const filtered = articles.filter((article) => {
-                const catLower = (article.category || "").toLowerCase();
-                return catLower.includes(slugLower);
-            });
-
-            setFilteredArticles(filtered);
-        } else {
-            setFilteredArticles(articles);
-        }
-    }, [categorySlug, articles]);
+        fetchData();
+    }, [categorySlug]);
 
     if (!categorySlug) return <div>Invalid Category</div>;
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <AuthNav />
+                <div className="flex-grow flex justify-center items-center">
+                    <div className="text-xl">Loading articles...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <AuthNav />
+                <div className="flex-grow flex flex-col justify-center items-center">
+                    <div className="text-xl text-red-600">{error}</div>
+                    <Link to="/category" className="mt-4 text-blue-600 hover:underline">Back to Categories</Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -43,25 +80,26 @@ const CategoryArticles = () => {
                 <div className="mb-8">
                     <Link to="/category" className="text-blue-600 hover:underline mb-2 inline-block">&larr; Back to Categories</Link>
                     <h1 className="text-4xl font-bold text-gray-900 font-primary">
-                        {capitalize(categorySlug)} Articles
+                        {categoryName || capitalize(categorySlug)} Articles
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Discover articles in {capitalize(categorySlug)}
+                        Discover articles in {categoryName || capitalize(categorySlug)}
                     </p>
                 </div>
 
-                {filteredArticles.length > 0 ? (
+                {articles.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredArticles.map((article) => (
-                            <ArticleCard
-                                key={article.id}
-                                title={article.title}
-                                image={article.image || ""}
-                                author={article.author_name || "Unknown"}
-                                date={article.date}
-                                content={article.content}
-                                avatar={article.author_avatar || ""}
-                            />
+                        {articles.map((article) => (
+                            <Link key={article.id} to={`/article/${article.slug}`}>
+                                <ArticleCard
+                                    title={article.title}
+                                    image={article.image || article.featured_image || ""}
+                                    author={article.author_name || "Unknown"}
+                                    date={article.date}
+                                    content={article.excerpt || article.content.substring(0, 150) + '...'}
+                                    avatar={article.author_avatar || "https://i.pravatar.cc/150?u=1"}
+                                />
+                            </Link>
                         ))}
                     </div>
                 ) : (

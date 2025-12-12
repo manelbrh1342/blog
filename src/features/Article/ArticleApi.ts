@@ -1,89 +1,136 @@
+import { getApiUrl, fetchWithAuth } from '../../config/api';
+
 export interface Article {
   id: number;
   title: string;
   content: string;
-  category: string;
+  excerpt?: string;
+  slug: string;
+  category_id?: number;
+  category?: string;
+  featured_image?: string;
   image?: string;
   date: string;
+  created_at?: string;
+  published_at?: string;
+  author_id?: number;
   user_id?: number;
   author_name?: string;
   author_avatar?: string;
+  status?: string;
+  tags?: string;
 }
-
-const API_URL = "http://192.168.43.17:5000/api/articles";
 
 const transformArticle = (article: any): Article => {
   return {
     id: article.id,
     title: article.title,
-    content: article.content,
-    category: article.category,
-    image: article.image
-      ? `http://192.168.43.17:5000/uploads/${article.image}`
-      : undefined,
-    date: new Date(article.date).toLocaleDateString("fr-FR"),
-    user_id: article.user_id,
-    author_name: article.author_name,
-    author_avatar: article.author_avatar
-      ? `http://192.168.43.17:5000/uploads/avatars/${article.author_avatar}`
-      : undefined,
+    content: article.content || '',
+    excerpt: article.excerpt,
+    slug: article.slug,
+    category_id: article.category_id,
+    featured_image: article.featured_image,
+    image: article.featured_image,
+    date: article.published_at 
+      ? new Date(article.published_at).toLocaleDateString("en-US", { 
+          month: "long", 
+          day: "numeric", 
+          year: "numeric" 
+        })
+      : article.created_at 
+      ? new Date(article.created_at).toLocaleDateString("en-US", { 
+          month: "long", 
+          day: "numeric", 
+          year: "numeric" 
+        })
+      : '',
+    created_at: article.created_at,
+    published_at: article.published_at,
+    author_id: article.author_id,
+    user_id: article.author_id,
+    status: article.status,
+    tags: article.tags,
   };
 };
 
-export const fetchArticles = async (): Promise<Article[]> => {
-  const response = await fetch(`${API_URL}/`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des articles");
+export const fetchArticles = async (params?: {
+  status?: string;
+  category_id?: number;
+  author_id?: number;
+}): Promise<Article[]> => {
+  const queryParams = new URLSearchParams();
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.category_id) queryParams.append('category_id', params.category_id.toString());
+  if (params?.author_id) queryParams.append('author_id', params.author_id.toString());
+  
+  const url = getApiUrl('ARTICLES', `/?${queryParams.toString()}`);
+  const response = await fetchWithAuth(url);
+  if (!response.ok) throw new Error("Error loading articles");
   const data = await response.json();
   return data.map(transformArticle);
 };
 
-export const fetchArticleById = async (id: number): Promise<Article> => {
-  const response = await fetch(`${API_URL}/${id}`);
-  if (!response.ok) throw new Error("Erreur lors du chargement de l'article");
+export const fetchArticleBySlug = async (slug: string): Promise<Article> => {
+  const url = getApiUrl('ARTICLES', `/${slug}`);
+  const response = await fetchWithAuth(url);
+  if (!response.ok) throw new Error("Error loading article");
   const data = await response.json();
   return transformArticle(data);
 };
 
 export const fetchRelatedArticles = async (
-  category: string
+  categoryId: number
 ): Promise<Article[]> => {
-  const response = await fetch(`${API_URL}/related/${category}`);
-  if (!response.ok)
-    throw new Error("Erreur lors du chargement des articles liés");
-  const data = await response.json();
-  return data.map(transformArticle);
+  return fetchArticles({ category_id: categoryId, status: 'published' });
 };
 
-export const createArticle = async (articleData: any): Promise<Article> => {
-  const response = await fetch(`${API_URL}/`, {
+export const createArticle = async (articleData: {
+  title: string;
+  content: string;
+  excerpt?: string;
+  slug?: string;
+  featured_image?: string;
+  author_id: number;
+  category_id?: number;
+  status?: string;
+  tags?: string;
+}): Promise<{ message: string; id: number }> => {
+  const url = getApiUrl('ARTICLES', '/');
+  const response = await fetchWithAuth(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(articleData),
   });
-  if (!response.ok) throw new Error("Erreur lors de la création d'article");
-
-  const data = await response.json();
-  return transformArticle(data);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error creating article");
+  }
+  return response.json();
 };
 
 export const updateArticle = async (
   id: number,
-  updatedData: any
-): Promise<Article> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  updatedData: Partial<Article>
+): Promise<{ message: string; id: number }> => {
+  const url = getApiUrl('ARTICLES', `/${id}`);
+  const response = await fetchWithAuth(url, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updatedData),
   });
-  if (!response.ok) throw new Error("Erreur lors de la mise à jour");
-
-  const data = await response.json();
-  return transformArticle(data);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error updating article");
+  }
+  return response.json();
 };
 
-export const deleteArticle = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+export const deleteArticle = async (id: number): Promise<{ message: string }> => {
+  const url = getApiUrl('ARTICLES', `/${id}`);
+  const response = await fetchWithAuth(url, {
     method: "DELETE",
   });
-  if (!response.ok) throw new Error("Erreur lors de la suppression");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error deleting article");
+  }
+  return response.json();
 };

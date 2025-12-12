@@ -1,3 +1,5 @@
+import { getApiUrl, fetchWithAuth } from '../../config/api';
+
 export interface Category {
   id: number;
   name: string;
@@ -8,44 +10,65 @@ export interface Category {
   updated_at: string;
 }
 
-const API_URL = "http://localhost:5004/api/categories";
-
 export const fetchCategories = async (): Promise<Category[]> => {
-  const response = await fetch(`${API_URL}/`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des catégories");
+  const url = getApiUrl('CATEGORIES', '/');
+  const response = await fetchWithAuth(url);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error loading categories");
+  }
   return response.json();
 };
 
 export const fetchCategoryBySlug = async (slug: string): Promise<Category> => {
-  const response = await fetch(`${API_URL}/${slug}`);
-  if (!response.ok) throw new Error("Erreur lors du chargement de la catégorie");
+  const url = getApiUrl('CATEGORIES', `/${slug}`);
+  const response = await fetchWithAuth(url);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error loading category");
+  }
   return response.json();
 };
 
-export const createCategory = async (categoryData: Partial<Category>): Promise<{ message: string; id: number }> => {
-  const response = await fetch(`${API_URL}/`, {
+export const createCategory = async (categoryData: {
+  name: string;
+  slug?: string;
+  description?: string;
+  parent_id?: number;
+}): Promise<{ message: string; id: number }> => {
+  const url = getApiUrl('CATEGORIES', '/');
+  const response = await fetchWithAuth(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(categoryData),
   });
-  if (!response.ok) throw new Error("Erreur lors de la création de la catégorie");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error creating category");
+  }
   return response.json();
 };
 
 export const updateCategory = async (id: number, categoryData: Partial<Category>): Promise<{ message: string; id: number }> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const url = getApiUrl('CATEGORIES', `/${id}`);
+  const response = await fetchWithAuth(url, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(categoryData),
   });
-  if (!response.ok) throw new Error("Erreur lors de la mise à jour de la catégorie");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error updating category");
+  }
   return response.json();
 };
 
 export const deleteCategory = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const url = getApiUrl('CATEGORIES', `/${id}`);
+  const response = await fetchWithAuth(url, {
     method: "DELETE",
   });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de la catégorie");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error deleting category");
+  }
   return response.json();
 };

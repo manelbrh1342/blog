@@ -1,3 +1,5 @@
+import { getApiUrl, fetchWithAuth } from '../../config/api';
+
 export interface AdminUser {
   id: number;
   username: string;
@@ -18,54 +20,85 @@ export interface AdminArticle {
 export interface AdminComment {
   id: number;
   content: string;
-  article_id: number;
+  post_id: number;
   user_id: number;
   created_at: string;
 }
 
-const API_URL = "http://localhost:5006/api/admin";
+export interface AdminStats {
+  total_actions: number;
+  recent_actions: Array<{
+    id: number;
+    admin_id: number;
+    action_type: string;
+    target_type: string;
+    target_id: number;
+    description: string;
+    created_at: string;
+  }>;
+}
 
-// Users management
-export const fetchUsers = async (): Promise<AdminUser[]> => {
-  const response = await fetch(`${API_URL}/users`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des utilisateurs");
+export interface AdminAction {
+  id: number;
+  admin_id: number;
+  action_type: string;
+  target_type: string;
+  target_id: number;
+  description: string;
+  metadata?: any;
+  created_at: string;
+}
+
+// Stats
+export const fetchAdminStats = async (): Promise<AdminStats> => {
+  const url = getApiUrl('ADMIN', '/stats');
+  const response = await fetchWithAuth(url);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error loading admin stats");
+  }
   return response.json();
 };
 
-export const deleteUser = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/users/${id}`, {
-    method: "DELETE",
+// Actions
+export const fetchAdminActions = async (page: number = 1, perPage: number = 20): Promise<{
+  actions: AdminAction[];
+  pagination: {
+    page: number;
+    per_page: number;
+    total: number;
+    pages: number;
+  };
+}> => {
+  const url = getApiUrl('ADMIN', `/actions?page=${page}&per_page=${perPage}`);
+  const response = await fetchWithAuth(url);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error loading admin actions");
+  }
+  return response.json();
+};
+
+export const logAdminAction = async (actionData: {
+  admin_id: number;
+  action_type: string;
+  target_type: string;
+  target_id: number;
+  description?: string;
+  metadata?: any;
+}): Promise<{ message: string; id: number }> => {
+  const url = getApiUrl('ADMIN', '/actions');
+  const response = await fetchWithAuth(url, {
+    method: "POST",
+    body: JSON.stringify(actionData),
   });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de l'utilisateur");
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error logging admin action");
+  }
   return response.json();
 };
 
-// Articles management
-export const fetchArticles = async (): Promise<AdminArticle[]> => {
-  const response = await fetch(`${API_URL}/articles`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des articles");
-  return response.json();
-};
-
-export const deleteArticle = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/articles/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de l'article");
-  return response.json();
-};
-
-// Comments management
-export const fetchComments = async (): Promise<AdminComment[]> => {
-  const response = await fetch(`${API_URL}/comments`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des commentaires");
-  return response.json();
-};
-
-export const deleteComment = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/comments/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression du commentaire");
-  return response.json();
-};
+// Note: The admin service doesn't have direct user/article/comment endpoints
+// These would need to be added to the admin service or fetched from respective services
+// For now, we'll use the stats and actions endpoints that exist

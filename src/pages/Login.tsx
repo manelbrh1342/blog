@@ -1,40 +1,42 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../features/Auth/AuthApi";
+import { loginSuccess } from "../features/Auth/AuthSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Fonction pour envoyer la connexion vers le backend Flask
   const handleLogin = async () => {
     if (!username || !password) {
-      alert("Please fill all fields");
+      setError("Please fill all fields");
       return;
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5002/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || "Login failed");
-        return;
-      }
-
-      alert("Login successful!");
-      console.log("User logged:", data);
-
-      // Exemple si tu veux sauvegarder le token plus tard :
-      // localStorage.setItem("token", data.token);
-    } catch (error) {
-      console.error("Error during login:", error);
-      alert("Server error");
+      setLoading(true);
+      setError(null);
+      const data = await loginUser({ username, password });
+      
+      // Store token and user info
+      dispatch(loginSuccess({ 
+        token: data.token, 
+        user: { username, id: data.user?.id } 
+      }));
+      
+      // Navigate to home
+      navigate("/home");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
+      setError(errorMessage);
+      console.error("Error during login:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,12 +102,19 @@ const Login = () => {
               </div>
             </div>
 
+            {error && (
+              <div className="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+
             <div className="flex flex-col items-center space-y-4 mt-8">
               <button
                 onClick={handleLogin}
-                className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg"
+                disabled={loading}
+                className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </button>
 
               <button
