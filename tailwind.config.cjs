@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'primary': ['Cormorant Infant'],
+        'primary': ['"Cormorant Infant"', 'serif'],
         'secondary': ['Poppins'],
       },
     },
