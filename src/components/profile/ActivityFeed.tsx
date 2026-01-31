@@ -178,17 +178,19 @@ export default function ActivityFeed() {
             {/* Header */}
             <div className="flex items-start justify-between mb-4 relative">
               <div className="flex items-center space-x-3">
-                <img
-                  src={activity.userAvatar}
-                  alt={activity.user}
-                  className="w-10 h-10 rounded-full border border-gray-200"
-                />
-                <div>
-                  <div className="text-sm text-gray-900">
-                    <span className="font-semibold text-gray-900">{activity.user}</span>{' '}
-                    <span className="text-gray-600">{activity.action}</span>
+                <div onClick={() => navigate(`/author/${encodeURIComponent(activity.user)}`)} className="cursor-pointer group flex items-center gap-3">
+                  <img
+                    src={activity.userAvatar}
+                    alt={activity.user}
+                    className="w-10 h-10 rounded-full border border-gray-200 group-hover:border-[#004aad] transition-colors"
+                  />
+                  <div>
+                    <div className="text-sm text-gray-900">
+                      <span className="font-semibold text-gray-900 group-hover:text-[#004aad] transition-colors">{activity.user}</span>{' '}
+                      <span className="text-gray-600">{activity.action}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">{activity.time}</div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5">{activity.time}</div>
                 </div>
               </div>
             </div>

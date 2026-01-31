@@ -127,16 +127,18 @@ const ArticlePage: React.FC = () => {
           </h1>
 
           <div className="flex items-center justify-between border-b border-gray-100 pb-8">
-            <div className="flex items-center gap-4">
-              <img
-                src={currentArticle.author_avatar || ''}
-                alt={currentArticle.author_name || 'Author'}
-                className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
-              />
-              <div>
-                <p className="font-bold text-gray-900">{currentArticle.author_name}</p>
-                <p className="text-sm text-gray-500">{currentArticle.date} · 5 min read</p>
-              </div>
+            <div className="flex items-center gap-4 group">
+              <Link to={`/author/${encodeURIComponent(currentArticle.author_name || '')}`} className="flex items-center gap-4">
+                <img
+                  src={currentArticle.author_avatar || ''}
+                  alt={currentArticle.author_name || 'Author'}
+                  className="w-12 h-12 rounded-full border-2 border-white shadow-sm group-hover:border-[#004aad] transition-colors"
+                />
+                <div>
+                  <p className="font-bold text-gray-900 group-hover:text-[#004aad] transition-colors">{currentArticle.author_name}</p>
+                  <p className="text-sm text-gray-500">{currentArticle.date} · 5 min read</p>
+                </div>
+              </Link>
             </div>
 
             <div className="flex gap-2">
