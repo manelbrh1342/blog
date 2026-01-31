@@ -21,37 +21,19 @@ const initializeStorage = (): void => {
 // Get all users from storage
 export const getAllUsers = (): UserProfile[] => {
     initializeStorage();
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : users;
+    // For static version, just return the constant users if localStorage fails or is empty
+    return users;
 };
 
 // Get user by ID
 export const getUserProfile = (id: string): Promise<UserProfile | null> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const allUsers = getAllUsers();
-            const user = allUsers.find(u => u.id === id);
-            resolve(user || null);
-        }, 300); // Simulate network delay
-    });
+    const user = users.find(u => u.id === id);
+    return Promise.resolve(user || null);
 };
 
 // Get current logged-in user
 export const getCurrentUser = (): Promise<UserProfile | null> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            initializeStorage();
-            const currentUserId = localStorage.getItem(CURRENT_USER_KEY);
-            if (!currentUserId) {
-                resolve(null);
-                return;
-            }
-
-            const allUsers = getAllUsers();
-            const user = allUsers.find(u => u.id === currentUserId);
-            resolve(user || null);
-        }, 200);
-    });
+    return Promise.resolve(users[0] || null); // Always return first user as logged in
 };
 
 // Update user profile
@@ -59,28 +41,9 @@ export const updateUserProfile = (
     id: string,
     data: UpdateProfileRequest
 ): Promise<UserProfile> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const allUsers = getAllUsers();
-            const userIndex = allUsers.findIndex(u => u.id === id);
-
-            if (userIndex === -1) {
-                reject(new Error('User not found'));
-                return;
-            }
-
-            // Update user data
-            allUsers[userIndex] = {
-                ...allUsers[userIndex],
-                ...data
-            };
-
-            // Save to localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
-
-            resolve(allUsers[userIndex]);
-        }, 500); // Simulate network delay
-    });
+    const user = users.find(u => u.id === id);
+    if (!user) throw new Error('User not found');
+    return Promise.resolve({ ...user, ...data });
 };
 
 // Upload profile photo
@@ -88,49 +51,7 @@ export const uploadProfilePhoto = (
     id: string,
     photoFile: File
 ): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!validTypes.includes(photoFile.type)) {
-            reject(new Error('Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.'));
-            return;
-        }
-
-        // Validate file size (max 5MB)
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-        if (photoFile.size > maxSize) {
-            reject(new Error('File size too large. Maximum size is 5MB.'));
-            return;
-        }
-
-        // Convert to Base64
-        const reader = new FileReader();
-        reader.onload = () => {
-            const base64String = reader.result as string;
-
-            // Update user profile with new photo
-            const allUsers = getAllUsers();
-            const userIndex = allUsers.findIndex(u => u.id === id);
-
-            if (userIndex === -1) {
-                reject(new Error('User not found'));
-                return;
-            }
-
-            allUsers[userIndex].profilePhoto = base64String;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
-
-            setTimeout(() => {
-                resolve(base64String);
-            }, 800); // Simulate upload delay
-        };
-
-        reader.onerror = () => {
-            reject(new Error('Failed to read file'));
-        };
-
-        reader.readAsDataURL(photoFile);
-    });
+    return Promise.resolve("https://api.dicebear.com/7.x/avataaars/svg?seed=newphoto");
 };
 
 // Set current user (for testing/demo purposes)

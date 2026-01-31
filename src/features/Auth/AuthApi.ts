@@ -1,19 +1,23 @@
-const BASE_URL = "http://localhost:5002/api/auth";
 
+// Mock Auth API
 export const signupUser = async (userData: any) => {
-  const response = await fetch(`${BASE_URL}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userData),
+  return Promise.resolve({
+    token: "mock-token-123",
+    user: {
+      id: "user-1", // Using existing user ID from users.ts if possible, or just mock
+      ...userData
+    }
   });
-  return response.json();
 };
 
 export const loginUser = async (loginData: any) => {
-  const response = await fetch(`${BASE_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(loginData),
+  // Simulate successful login for any credentials
+  return Promise.resolve({
+    token: "mock-token-123",
+    user: {
+      id: "user-1",
+      email: loginData.email,
+      name: "Tech Vision", // consistent with users.ts
+    }
   });
-  return response.json();
 };

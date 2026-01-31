@@ -71,7 +71,7 @@ const CommentsPage: React.FC = () => {
 
                 <div className="mt-12 max-w-4xl mx-auto">
                     <div className="flex items-center gap-4 mb-8">
-                        <Link to={`/article/${articleId}`} className="text-blue-900 hover:underline">
+                        <Link to={`/article/${articleId}`} className="text-gray-500 hover:text-[#004aad] transition-colors flex items-center gap-2">
                             &larr; Back to Article
                         </Link>
                         <h1 className="text-[#004aad] font-primary font-bold text-4xl">Comments</h1>
@@ -87,7 +87,7 @@ const CommentsPage: React.FC = () => {
                         />
                         <div className="flex justify-end mt-4">
                             <button
-                                className="bg-[#004aad] text-white font-medium px-8 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                                className="bg-[#004aad] text-white font-medium px-8 py-2 rounded-lg hover:bg-[#003d82] transition-colors"
                                 onClick={handlePostComment}
                             >
                                 Post Comment

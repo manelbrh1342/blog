@@ -10,9 +10,9 @@ export const users: UserProfile[] = [
         state: "Île-de-France",
         zipCode: "75001",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=TechVision",
         bio: "Technology enthusiast and innovation advocate. Passionate about sharing the latest tech trends.",
-        eventsCount: 5,
+        eventsCount: 15,
         joinDate: "2024-01-15"
     },
     {
@@ -24,9 +24,9 @@ export const users: UserProfile[] = [
         state: "Auvergne-Rhône-Alpes",
         zipCode: "69001",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Science",
         bio: "Dedicated to promoting scientific research and education.",
-        eventsCount: 3,
+        eventsCount: 8,
         joinDate: "2024-02-01"
     },
     {
@@ -38,9 +38,9 @@ export const users: UserProfile[] = [
         state: "Provence-Alpes-Côte d'Azur",
         zipCode: "13001",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Agency",
         bio: "Creative communication agency specializing in event management.",
-        eventsCount: 4,
+        eventsCount: 12,
         joinDate: "2024-01-20"
     },
     {
@@ -52,9 +52,9 @@ export const users: UserProfile[] = [
         state: "Auvergne-Rhône-Alpes",
         zipCode: "38000",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nature",
         bio: "Outdoor adventure specialists bringing you closer to nature.",
-        eventsCount: 2,
+        eventsCount: 5,
         joinDate: "2024-03-10"
     },
     {
@@ -66,9 +66,9 @@ export const users: UserProfile[] = [
         state: "Île-de-France",
         zipCode: "75008",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Style",
         bio: "Fashion forward, style conscious. Bringing you the latest trends.",
-        eventsCount: 6,
+        eventsCount: 20,
         joinDate: "2024-01-05"
     },
     {
@@ -80,9 +80,9 @@ export const users: UserProfile[] = [
         state: "Île-de-France",
         zipCode: "75002",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Business",
         bio: "Business news and startup ecosystem coverage.",
-        eventsCount: 7,
+        eventsCount: 18,
         joinDate: "2023-12-01"
     },
     {
@@ -94,9 +94,9 @@ export const users: UserProfile[] = [
         state: "Provence-Alpes-Côte d'Azur",
         zipCode: "06000",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zen",
         bio: "Promoting wellness, mindfulness, and healthy living.",
-        eventsCount: 3,
+        eventsCount: 7,
         joinDate: "2024-02-15"
     },
     {
@@ -108,9 +108,9 @@ export const users: UserProfile[] = [
         state: "Occitanie",
         zipCode: "31000",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Music",
         bio: "Live music events and concert organization.",
-        eventsCount: 8,
+        eventsCount: 25,
         joinDate: "2023-11-20"
     },
     {
@@ -122,9 +122,9 @@ export const users: UserProfile[] = [
         state: "Nouvelle-Aquitaine",
         zipCode: "33000",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=History",
         bio: "Preserving and sharing historical knowledge through exhibitions.",
-        eventsCount: 2,
+        eventsCount: 4,
         joinDate: "2024-01-30"
     },
     {
@@ -136,10 +136,150 @@ export const users: UserProfile[] = [
         state: "Auvergne-Rhône-Alpes",
         zipCode: "69002",
         country: "France",
-        profilePhoto: "",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sport",
         bio: "Organizing sports events and promoting active lifestyles.",
-        eventsCount: 5,
+        eventsCount: 16,
         joinDate: "2023-10-15"
+    },
+    {
+        id: "user-11",
+        fullName: "Code Master",
+        email: "dev@codemaster.io",
+        address: "101 Binary Blvd",
+        city: "Nantes",
+        state: "Pays de la Loire",
+        zipCode: "44000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Code",
+        bio: "Full stack developer sharing tips and tutorials.",
+        eventsCount: 9,
+        joinDate: "2024-03-01"
+    },
+    {
+        id: "user-12",
+        fullName: "Travel Bug",
+        email: "explore@travelbug.com",
+        address: "Global Nomad",
+        city: "Strasbourg",
+        state: "Grand Est",
+        zipCode: "67000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Travel",
+        bio: "Explaining the world one city at a time.",
+        eventsCount: 11,
+        joinDate: "2024-02-20"
+    },
+    {
+        id: "user-13",
+        fullName: "Foodie Heaven",
+        email: "yum@foodieheaven.fr",
+        address: "12 Gourmet Lane",
+        city: "Dijon",
+        state: "Bourgogne-Franche-Comté",
+        zipCode: "21000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Foodie",
+        bio: "Delicious recipes and restaurant reviews.",
+        eventsCount: 14,
+        joinDate: "2024-01-10"
+    },
+    {
+        id: "user-14",
+        fullName: "Art Gallery",
+        email: "curator@artgallery.com",
+        address: "55 Canvas Court",
+        city: "Lille",
+        state: "Hauts-de-France",
+        zipCode: "59000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Art",
+        bio: "Showcasing contemporary art and artists.",
+        eventsCount: 6,
+        joinDate: "2024-03-05"
+    },
+    {
+        id: "user-15",
+        fullName: "Eco Warrior",
+        email: "save@planet.org",
+        address: "1 Earth Way",
+        city: "Rennes",
+        state: "Brittany",
+        zipCode: "35000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Eco",
+        bio: "Advocating for a sustainable future.",
+        eventsCount: 8,
+        joinDate: "2024-02-10"
+    },
+    {
+        id: "user-16",
+        fullName: "Cinema Paradiso",
+        email: "info@cinemaparadiso.fr",
+        address: "77 Film Reel Rd",
+        city: "Cannes",
+        state: "Provence-Alpes-Côte d'Azur",
+        zipCode: "06400",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Cinema",
+        bio: "Celebrating the magic of movies.",
+        eventsCount: 10,
+        joinDate: "2023-11-15"
+    },
+    {
+        id: "user-17",
+        fullName: "Book Worm",
+        email: "read@bookworm.com",
+        address: "99 Library Lane",
+        city: "Montpellier",
+        state: "Occitanie",
+        zipCode: "34000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Book",
+        bio: "Book reviews and literary discussions.",
+        eventsCount: 5,
+        joinDate: "2024-01-25"
+    },
+    {
+        id: "user-18",
+        fullName: "Gamer Zone",
+        email: "play@gamerzone.net",
+        address: "88 Pixel Place",
+        city: "Toulon",
+        state: "Provence-Alpes-Côte d'Azur",
+        zipCode: "83000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Gamer",
+        bio: "Video game news, reviews, and streams.",
+        eventsCount: 13,
+        joinDate: "2023-12-10"
+    },
+    {
+        id: "user-19",
+        fullName: "Pet Lovers",
+        email: "woof@petlovers.com",
+        address: "44 Paws Blvd",
+        city: "Angers",
+        state: "Pays de la Loire",
+        zipCode: "49000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet",
+        bio: "Tips for pet care and training.",
+        eventsCount: 4,
+        joinDate: "2024-03-15"
+    },
+    {
+        id: "user-20",
+        fullName: "DIY Expert",
+        email: "build@diyexpert.com",
+        address: "66 Hammer St",
+        city: "Saint-Étienne",
+        state: "Auvergne-Rhône-Alpes",
+        zipCode: "42000",
+        country: "France",
+        profilePhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=DIY",
+        bio: "Home improvement and crafting tutorials.",
+        eventsCount: 7,
+        joinDate: "2024-02-05"
     }
 ];
 
@@ -148,7 +288,7 @@ export const getUserById = (id: string): UserProfile | undefined => {
     return users.find(user => user.id === id);
 };
 
-// Helper function to get user by name (for backward compatibility with events)
+// Helper function to get user by name
 export const getUserByName = (name: string): UserProfile | undefined => {
     return users.find(user => user.fullName === name);
 };

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { events as allEvents } from '../data/events';
-import Navbar from '../components/Navbar';
 
 interface CalendarDay {
   date: number;
@@ -27,10 +26,21 @@ const DAYS_FR = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
 const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([]);
+  const [events, setEvents] = useState<typeof allEvents>([]);
+
+  useEffect(() => {
+    // Load events from localStorage
+    const storedEvents = JSON.parse(localStorage.getItem('all_events') || '[]');
+    if (storedEvents.length > 0) {
+      setEvents(storedEvents);
+    } else {
+      setEvents(allEvents);
+    }
+  }, []);
 
   useEffect(() => {
     generateCalendar(currentDate);
-  }, [currentDate]);
+  }, [currentDate, events]);
 
   // Helper to parse "20 NOVEMBRE 2024" format
   const parseEventDate = (dateStr: string): Date | null => {
@@ -84,7 +94,7 @@ const Calendar: React.FC = () => {
 
     // Current month days
     for (let i = 1; i <= daysInMonth; i++) {
-      const dayEvents = allEvents.filter(event => {
+      const dayEvents = events.filter(event => {
         const eventDate = parseEventDate(event.date);
         if (!eventDate) return false;
 
@@ -131,7 +141,6 @@ const Calendar: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <div
         className="min-h-screen relative overflow-hidden mt-16"
         style={{
@@ -195,7 +204,7 @@ const Calendar: React.FC = () => {
                           <div className="absolute inset-0">
                             <img
                               src={day.events[0].image
-                                ? (day.events[0].image.startsWith('/') ? day.events[0].image : `/images/${day.events[0].image}`)
+                                ? (day.events[0].image.startsWith('data:') || day.events[0].image.startsWith('http') ? day.events[0].image : `/images/${day.events[0].image}`)
                                 : "/api/placeholder/400/320"}
                               alt={day.events[0].title}
                               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

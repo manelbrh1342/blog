@@ -6,35 +6,47 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // Fonction pour envoyer la connexion vers le backend Flask
   const handleLogin = async () => {
     if (!username || !password) {
       alert("Please fill all fields");
       return;
     }
 
+    // Check specific admin credentials first
+    if (username === "admin" && password === "admin123") {
+      const adminData = {
+        token: "admin-token-secret",
+        user: { username: "admin", role: "admin" }
+      };
+      localStorage.setItem("token", adminData.token);
+      localStorage.setItem("user", JSON.stringify(adminData.user));
+      window.dispatchEvent(new Event("storage"));
+      navigate('/admin');
+      return;
+    }
+
+    // Default User Login (Bypass Backend)
     try {
-      const response = await fetch("http://127.0.0.1:5002/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const data = await response.json();
+      const mockData = {
+        token: "mock-token-12345",
+        user: { username: username, role: "user" }
+      };
 
-      if (!response.ok) {
-        alert(data.error || "Login failed");
-        return;
-      }
+      console.log("User logged via Mock:", mockData);
+      localStorage.setItem("token", mockData.token);
+      localStorage.setItem("user", JSON.stringify(mockData.user));
+
+      // Dispatch storage event so useAuth hook picks it up immediately
+      window.dispatchEvent(new Event("storage"));
 
       alert("Login successful!");
-      console.log("User logged:", data);
-
-      // Exemple si tu veux sauvegarder le token plus tard :
-      // localStorage.setItem("token", data.token);
+      navigate('/home'); // Redirect to Home
     } catch (error) {
       console.error("Error during login:", error);
-      alert("Server error");
+      alert("Something went wrong");
     }
   };
 
@@ -103,17 +115,30 @@ const Login = () => {
             <div className="flex flex-col items-center space-y-4 mt-8">
               <button
                 onClick={handleLogin}
-                className="bg-gray-100 text-[#004aad] font-bold py-2 px-12 rounded-xl hover:bg-white transition-colors shadow-lg"
+                className="bg-white text-[#004aad] font-bold py-3 px-12 rounded-xl hover:bg-gray-50 transition-colors shadow-lg border-2 border-transparent hover:border-white/50"
               >
                 Login
               </button>
 
-              <button
-                onClick={() => navigate('/admin')}
-                className="bg-gray-800 text-white font-bold py-2 px-8 rounded-xl hover:bg-gray-700 transition-colors shadow-lg text-sm"
-              >
-                Admin (Temp)
-              </button>
+              <div className="mt-8 pt-6 border-t border-white/20 w-full text-center">
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20 text-left">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-[#004aad] p-1.5 rounded-full shrink-0">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium text-sm mb-1">Expert/Admin Mode</p>
+                      <p className="text-blue-100 text-xs leading-relaxed mb-2">
+                        To access the admin dashboard and manage content, please use these credentials:
+                      </p>
+                      <div className="bg-[#003d82]/50 rounded px-2 py-1 inline-flex gap-3 text-xs text-blue-50 font-mono">
+                        <span>user: <strong className="text-white">admin</strong></span>
+                        <span>pass: <strong className="text-white">admin123</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div className="flex flex-col items-center space-y-1">
                 <p className="text-white text-sm">Don't have an account ?</p>

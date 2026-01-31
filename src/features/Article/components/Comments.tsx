@@ -14,23 +14,9 @@ const Comments: React.FC<CommentsProps> = ({ articleId }) => {
   // Charger les commentaires depuis le backend
   // Charger les commentaires depuis le backend (Dummy data for now)
   useEffect(() => {
-    const dummyComments = [
-      {
-        id: 1,
-        user_id: 2,
-        content: "Great article! Very informative.",
-        created_at: "2023-10-26T10:00:00Z",
-        user: { name: "Alice", avatar: "https://i.pravatar.cc/150?u=alice" }
-      },
-      {
-        id: 2,
-        user_id: 3,
-        content: "I agree, AI is the future.",
-        created_at: "2023-10-26T11:30:00Z",
-        user: { name: "Charlie", avatar: "https://i.pravatar.cc/150?u=charlie" }
-      }
-    ];
-    setComments(dummyComments);
+    // Load comments from local storage
+    const storedComments = JSON.parse(localStorage.getItem(`comments_${articleId}`) || '[]');
+    setComments(storedComments);
   }, [articleId]);
 
   // Ajouter un nouveau commentaire
@@ -38,9 +24,18 @@ const Comments: React.FC<CommentsProps> = ({ articleId }) => {
     if (!newComment.trim()) return;
 
     try {
-      const commentData = { post_id: articleId, content: newComment, user_id: 1 }; // Placeholder user_id, needs to be replaced with actual user ID
-      const addedComment = await addComment(commentData); // Utilise postComment si tu as renommé dans CommentApi.ts
-      setComments((prev) => [...prev, addedComment]);
+      const newCommentObj = {
+        id: Date.now(),
+        post_id: articleId,
+        content: newComment,
+        user_id: 1, // Current user
+        created_at: "Just now",
+        user: { name: "You", avatar: "https://i.pravatar.cc/150?img=12" }
+      };
+
+      const updatedComments = [...comments, newCommentObj];
+      setComments(updatedComments);
+      localStorage.setItem(`comments_${articleId}`, JSON.stringify(updatedComments));
       setNewComment("");
     } catch (err) {
       console.error("Erreur lors de l'ajout du commentaire:", err);
@@ -48,7 +43,7 @@ const Comments: React.FC<CommentsProps> = ({ articleId }) => {
   };
 
   return (
-    <div className="flex flex-col mt-5 w-100 md:w-150">
+    <div className="flex flex-col mt-5 w-full">
       <p className="text-blue-900 font-bold text-3xl text-left">Comments</p>
       <div className="flex flex-col bg-white rounded-xl mt-6 h-40">
         <p className="text-sm m-3 text-left">Add New Comment</p>

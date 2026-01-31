@@ -1,6 +1,5 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 import { Upload, Type, Tag, FileText, User, Image as ImageIcon } from 'lucide-react';
 
 interface FormData {
@@ -49,15 +48,40 @@ const AddEvent: React.FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Implémenter la soumission du formulaire
-    console.log('Nouvel événement:', formData);
-    alert('Événement créé avec succès!');
-    navigate('/');
+
+    // Create new event object
+    const newEvent = {
+      id: Date.now(),
+      title: formData.title,
+      category: formData.category,
+      content: formData.content,
+      author: formData.author,
+      image: imagePreview || null, // Use the base64 string
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      likes: 0,
+      favorites: 0,
+      views: 0,
+      comments: []
+    };
+
+    try {
+      // Get existing events
+      const existingEvents = JSON.parse(localStorage.getItem('all_events') || '[]');
+      // Add new event to the beginning
+      const updatedEvents = [newEvent, ...existingEvents];
+      // Save to localStorage
+      localStorage.setItem('all_events', JSON.stringify(updatedEvents));
+
+      alert('Event created successfully!');
+      navigate('/events');
+    } catch (error) {
+      console.error("Storage error:", error);
+      alert('Failed to save event. The image might be too large for local storage.');
+    }
   };
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">

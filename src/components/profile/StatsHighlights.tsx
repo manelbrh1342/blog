@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -50,33 +49,34 @@ const StatCard = ({ title, value, percentage, trend }: StatCardProps) => {
 };
 
 export default function StatsHighlights() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    // Generate a random user ID for simulation
-    const userId = Math.floor(Math.random() * 1000);
-    fetch(`http://127.0.0.1:5000/api/stats?userId=${userId}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch stats');
-        return res.json();
-      })
-      .then(data => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Failed to load stats. Ensure backend is running.');
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div className="p-8 text-center">Loading stats...</div>;
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-  if (!data) return null;
+  const data = {
+    summaryCards: [
+      { title: "Total Views", value: "1,234", percentage: "+12%", trend: "up" },
+      { title: "Total Likes", value: "892", percentage: "+5%", trend: "up" },
+      { title: "Comments", value: "156", percentage: "-2%", trend: "down" },
+      { title: "Shares", value: "45", percentage: "+8%", trend: "up" }
+    ],
+    activityData: [
+      { name: 'Jan', thisYear: 4000, lastYear: 2400 },
+      { name: 'Feb', thisYear: 3000, lastYear: 1398 },
+      { name: 'Mar', thisYear: 2000, lastYear: 9800 },
+      { name: 'Apr', thisYear: 2780, lastYear: 3908 },
+      { name: 'May', thisYear: 1890, lastYear: 4800 },
+      { name: 'Jun', thisYear: 2390, lastYear: 3800 },
+      { name: 'Jul', thisYear: 3490, lastYear: 4300 },
+    ],
+    categoryData: [
+      { name: 'Tech', count: 120 },
+      { name: 'Health', count: 80 },
+      { name: 'Sport', count: 60 },
+      { name: 'Game', count: 40 },
+    ],
+    statusData: [
+      { name: 'Published', value: 60, color: '#004DA6' },
+      { name: 'Draft', value: 30, color: '#BFDBFE' },
+      { name: 'Scheduled', value: 10, color: '#9CA3AF' },
+    ]
+  };
 
   const { activityData, categoryData, statusData, summaryCards } = data;
 
@@ -87,8 +87,8 @@ export default function StatsHighlights() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {summaryCards.map((card: StatCardProps, index: number) => (
-            <StatCard key={index} {...card} />
+          {summaryCards.map((card, index) => (
+            <StatCard key={index} {...card} trend={card.trend as 'up' | 'down' | 'neutral'} />
           ))}
         </div>
 

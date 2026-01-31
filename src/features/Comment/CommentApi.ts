@@ -1,25 +1,27 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
+import { mockComments } from '../../data/mock';
 
 export const commentApi = createApi({
   reducerPath: 'commentApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5001/api' }),
+  baseQuery: fakeBaseQuery(),
   endpoints: (builder) => ({
     getComments: builder.query({
-      query: (postId) => `/comments/?post_id=${postId}`,
+      queryFn: async (postId) => {
+        const comments = mockComments.filter(c => c.post_id === Number(postId));
+        return { data: comments };
+      },
     }),
     addComment: builder.mutation({
-      query: (comment) => ({
-        url: '/comments',
-        method: 'POST',
-        body: comment,
-      }),
+      queryFn: async (comment) => {
+        const newComment = { ...comment, id: Math.random() };
+        mockComments.push(newComment);
+        return { data: newComment };
+      },
     }),
     updateComment: builder.mutation({
-      query: ({ id, ...comment }) => ({
-        url: `/comments/${id}`,
-        method: 'PUT',
-        body: comment,
-      }),
+      queryFn: async ({ id, ...comment }) => {
+        return { data: { id, ...comment } };
+      },
     }),
   }),
 });
@@ -32,23 +34,12 @@ export const {
 
 // Plain functions for use in slices or other places
 export const fetchCommentsByPostId = async (postId: number) => {
-  const response = await fetch(`http://localhost:5001/api/comments/?post_id=${postId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch comments');
-  }
-  return response.json();
+  const comments = mockComments.filter(c => c.post_id === Number(postId));
+  return Promise.resolve(comments);
 };
 
 export const addComment = async (comment: any) => {
-  const response = await fetch('http://localhost:5001/api/comments', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(comment),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to add comment');
-  }
-  return response.json();
+  const newComment = { ...comment, id: Math.floor(Math.random() * 10000) };
+  // In a real static app we can't persist, but for session it works
+  return Promise.resolve(newComment);
 };
