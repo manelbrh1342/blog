@@ -5,8 +5,7 @@ import StatsHighlights from '../components/profile/StatsHighlights';
 import UserContent from '../components/profile/UserContent';
 import Settings from '../components/profile/Settings';
 import AuthNav from '../components/AuthNavigation';
-import ActivityFeed from '../components/profile/ActivityFeed';
-import ProfileActivityFeed from '../components/profile/ProfileActivityFeed';
+
 
 export default function ProfileDetails() {
   const [activeTab, setActiveTab] = useState('profile-details');
@@ -44,8 +43,6 @@ export default function ProfileDetails() {
         return <StatsHighlights />;
       case 'user-content':
         return <UserContent />;
-      case 'activity-feed':
-        return <ProfileActivityFeed />;
       case 'settings':
         return <Settings />;
       default:
@@ -70,10 +67,12 @@ export default function ProfileDetails() {
 
   return (
     <>
-    <AuthNav />
-    <div className="min-h-screen bg-gray-50 flex">
-      <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      {renderMainContent()}
-    </div></>
+      <AuthNav />
+      <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+        <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="flex-1 w-full md:w-auto">
+          {renderMainContent()}
+        </div>
+      </div></>
   );
 }

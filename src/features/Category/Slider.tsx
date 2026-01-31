@@ -57,7 +57,7 @@ export default function Slider({ items }: SliderProps) {
           {/* DISCOVER → Page articles de cette catégorie */}
           <button
             onClick={() =>
-              navigate(`/articles?category=${items[current].category}`)
+              navigate(`/category/${items[current].category}`)
             }
             className="px-6 py-2 border border-white rounded-xl hover:bg-white/20"
           >

@@ -23,49 +23,36 @@ export interface AdminComment {
   created_at: string;
 }
 
-const API_URL = "http://localhost:5006/api/admin";
-
 // Users management
 export const fetchUsers = async (): Promise<AdminUser[]> => {
-  const response = await fetch(`${API_URL}/users`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des utilisateurs");
-  return response.json();
+  return Promise.resolve([
+    { id: 1, username: "admin", email: "admin@example.com", role: "admin", created_at: new Date().toISOString() },
+    { id: 2, username: "user", email: "user@example.com", role: "user", created_at: new Date().toISOString() }
+  ]);
 };
 
 export const deleteUser = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/users/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de l'utilisateur");
-  return response.json();
+  return Promise.resolve({ message: "User deleted" });
 };
 
 // Articles management
 export const fetchArticles = async (): Promise<AdminArticle[]> => {
-  const response = await fetch(`${API_URL}/articles`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des articles");
-  return response.json();
+  return Promise.resolve([
+    { id: 1, title: "Admin Article 1", content: "Content", author_id: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+  ]);
 };
 
 export const deleteArticle = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/articles/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de l'article");
-  return response.json();
+  return Promise.resolve({ message: "Article deleted" });
 };
 
 // Comments management
 export const fetchComments = async (): Promise<AdminComment[]> => {
-  const response = await fetch(`${API_URL}/comments`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des commentaires");
-  return response.json();
+  return Promise.resolve([
+    { id: 1, content: "Admin Comment", article_id: 1, user_id: 2, created_at: new Date().toISOString() }
+  ]);
 };
 
 export const deleteComment = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/comments/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression du commentaire");
-  return response.json();
+  return Promise.resolve({ message: "Comment deleted" });
 };

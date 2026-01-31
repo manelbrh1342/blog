@@ -75,7 +75,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
         <div className="relative w-64 h-48 flex-shrink-0 overflow-hidden rounded-xl">
           {event.image ? (
             <img
-              src={`/images/${event.image}`}
+              src={event.image.startsWith('http') || event.image.startsWith('data:') ? event.image : `/images/${event.image}`}
               alt={event.title}
               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
             />
@@ -211,7 +211,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onLike, onFavorite, varian
       <div className="relative h-64 overflow-hidden">
         {event.image ? (
           <img
-            src={`/images/${event.image}`}
+            src={event.image.startsWith('http') ? event.image : `/images/${event.image}`}
             alt={event.title}
             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
           />

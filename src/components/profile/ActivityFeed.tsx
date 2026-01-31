@@ -1,195 +1,290 @@
-import React from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+interface Activity {
+  id: number;
+  user: string;
+  userAvatar: string;
+  action: string;
+  title?: string;
+  time: string;
+  image?: string;
+  excerpt?: string;
+  comment?: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  isLiked?: boolean;
+  userComments?: { text: string; user: string; time: string }[];
+}
+
+// Mapped to existing blogPosts IDs for consistency
+const initialActivities: Activity[] = [
+  {
+    id: 1, // Matches "The Ultimate Guide to Backpacking in Bali"
+    user: 'Sarah Jenkins',
+    userAvatar: 'https://i.pravatar.cc/150?img=5',
+    action: 'published a new article',
+    title: 'The Ultimate Guide to Backpacking in Bali',
+    time: '2 hours ago',
+    image: '/images/IMG7.jpg',
+    excerpt: 'Discover hidden waterfalls, sacred temples, and the best local eats in this comprehensive guide for solo travelers.',
+    likes: 234,
+    comments: 45,
+    shares: 12,
+    isLiked: false
+  },
+  {
+    id: 2, // Matches "Exploring the Alps"
+    user: 'Marc DuPont',
+    userAvatar: 'https://i.pravatar.cc/150?img=11',
+    action: 'liked your article',
+    title: 'Exploring the Alps: A Hiker\'s Dream',
+    time: '5 hours ago',
+    likes: 892,
+    comments: 167,
+    shares: 43,
+    isLiked: true
+  },
+  {
+    id: 19, // Matches "Tech Trends to Watch in 2026"
+    user: 'Tech Insider',
+    userAvatar: 'https://i.pravatar.cc/150?img=15',
+    action: 'commented on',
+    title: 'Tech Trends to Watch in 2026',
+    time: '8 hours ago',
+    comment: 'This is exactly what I was looking for! Great insights on AI development and future predictions.',
+    likes: 456,
+    comments: 89,
+    shares: 23,
+    isLiked: false
+  },
+  {
+    id: 7, // Matches "Sustainable Fashion"
+    user: 'Chloe Kim',
+    userAvatar: 'https://i.pravatar.cc/150?img=25',
+    action: 'published a new article',
+    title: 'Sustainable Fashion: More Than a Trend',
+    time: '1 day ago',
+    image: '/images/IMG12.jpg',
+    excerpt: 'How the industry is shifting towards eco-friendly materials and ethical labor.',
+    likes: 543,
+    comments: 98,
+    shares: 31,
+    isLiked: false
+  },
+  {
+    id: 10, // Matches "Urban Farming"
+    user: 'Green Thumb',
+    userAvatar: 'https://i.pravatar.cc/150?img=52',
+    action: 'added you as a collaborator',
+    title: 'Urban Farming: Growing Food in Concrete Jungles',
+    time: '3 days ago',
+    likes: 321,
+    comments: 67,
+    shares: 19,
+    isLiked: false,
+    userComments: []
+  }
+];
 
 export default function ActivityFeed() {
-  const activities = [
-    {
-      id: 1,
-      user: 'Cameron Williamson',
-      userAvatar: 'https://i.pravatar.cc/150?img=12',
-      action: 'published a new article',
-      title: 'The Art of Minimalist Living: Finding Joy in Less',
-      time: '2 hours ago',
-      image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop',
-      excerpt: 'Discover how embracing minimalism can transform your life and bring you closer to what truly matters...',
-      likes: 234,
-      comments: 45,
-      shares: 12
-    },
-    {
-      id: 2,
-      user: 'Esther Howard',
-      userAvatar: 'https://i.pravatar.cc/150?img=25',
-      action: 'liked your article',
-      title: 'Italy: Where Every Street Feels Like a Story',
-      time: '5 hours ago',
-      likes: 892,
-      comments: 167,
-      shares: 43
-    },
-    {
-      id: 3,
-      user: 'Wade Warren',
-      userAvatar: 'https://i.pravatar.cc/150?img=15',
-      action: 'commented on',
-      title: 'Tech Trends 2025: What to Expect',
-      time: '8 hours ago',
-      comment: 'This is exactly what I was looking for! Great insights on AI development and future predictions.',
-      likes: 456,
-      comments: 89,
-      shares: 23
-    },
-    {
-      id: 4,
-      user: 'Jenny Wilson',
-      userAvatar: 'https://i.pravatar.cc/150?img=32',
-      action: 'shared your article',
-      title: 'The Ultimate Guide to Remote Work Productivity',
-      time: '1 day ago',
-      likes: 678,
-      comments: 134,
-      shares: 67
-    },
-    {
-      id: 5,
-      user: 'Robert Fox',
-      userAvatar: 'https://i.pravatar.cc/150?img=18',
-      action: 'published a new article',
-      title: 'Sustainable Fashion: Making Conscious Choices',
-      time: '1 day ago',
-      image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop',
-      excerpt: 'Learn how to build a sustainable wardrobe that reflects your values while staying stylish and timeless...',
-      likes: 543,
-      comments: 98,
-      shares: 31
-    },
-    {
-      id: 6,
-      user: 'Kristin Watson',
-      userAvatar: 'https://i.pravatar.cc/150?img=28',
-      action: 'started following you',
-      time: '2 days ago'
-    },
-    {
-      id: 7,
-      user: 'Jacob Jones',
-      userAvatar: 'https://i.pravatar.cc/150?img=22',
-      action: 'added you as a collaborator',
-      title: 'Building Better Communities Through Design',
-      time: '3 days ago',
-      likes: 321,
-      comments: 67,
-      shares: 19
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
+  const [commentText, setCommentText] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load from localStorage or use initial data
+    const savedActivities = localStorage.getItem('activities');
+    if (savedActivities) {
+      setActivities(JSON.parse(savedActivities));
+    } else {
+      setActivities(initialActivities);
+      localStorage.setItem('activities', JSON.stringify(initialActivities));
     }
-  ];
+  }, []);
+
+  const handleLike = (id: number) => {
+    const updatedActivities = activities.map(activity => {
+      if (activity.id === id) {
+        return {
+          ...activity,
+          likes: activity.isLiked ? activity.likes - 1 : activity.likes + 1,
+          isLiked: !activity.isLiked
+        };
+      }
+      return activity;
+    });
+
+    setActivities(updatedActivities);
+    localStorage.setItem('activities', JSON.stringify(updatedActivities));
+  };
+
+  const handleShare = (id: number) => {
+    const updatedActivities = activities.map(activity => {
+      if (activity.id === id) {
+        return { ...activity, shares: activity.shares + 1 };
+      }
+      return activity;
+    });
+    setActivities(updatedActivities);
+    localStorage.setItem('activities', JSON.stringify(updatedActivities));
+    alert('Content shared!');
+  };
+
+  const toggleCommentInput = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveCommentId(activeCommentId === id ? null : id);
+    setCommentText(""); // Reset text when toggling
+  };
+
+  const submitComment = (id: number) => {
+    if (!commentText.trim()) return;
+
+    const updatedActivities = activities.map(activity => {
+      if (activity.id === id) {
+        return {
+          ...activity,
+          comments: activity.comments + 1,
+          userComments: [...(activity.userComments || []), { text: commentText, user: "You", time: "Just now" }]
+        };
+      }
+      return activity;
+    });
+
+    setActivities(updatedActivities);
+    localStorage.setItem('activities', JSON.stringify(updatedActivities));
+    setCommentText("");
+    setActiveCommentId(null); // Close input after submit
+  };
 
   return (
-    <main className="flex-1 p-8 text-center">
-      <h1 className="text-4xl font-extrabold text-[#004DA6] mb-12">Activity Feed</h1>
+    <section className={`font-sans ${window.location.pathname.includes('/profile') ? '' : 'p-4 md:p-8'}`}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-800">Activity Feed</h2>
+        <button
+          onClick={() => console.log("Navigate to /feed")}
+          className="text-sm text-[#004DA6] font-medium hover:underline"
+        >
+          View All
+        </button>
+      </div>
 
-      {/* Activity Items */}
-      <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="space-y-6">
         {activities.map((activity) => (
-          <div key={activity.id} className="border-b border-gray-100 pb-6 last:border-0">
-            {/* Activity Header */}
-            <div className="flex items-start justify-between mb-3">
+          <div key={activity.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4 relative">
               <div className="flex items-center space-x-3">
                 <img
                   src={activity.userAvatar}
                   alt={activity.user}
-                  className="w-12 h-12 rounded-full"
+                  className="w-10 h-10 rounded-full border border-gray-200"
                 />
                 <div>
-                  <p className="text-gray-900">
-                    <span className="font-semibold">{activity.user}</span>{' '}
+                  <div className="text-sm text-gray-900">
+                    <span className="font-semibold text-gray-900">{activity.user}</span>{' '}
                     <span className="text-gray-600">{activity.action}</span>
-                    {activity.title && (
-                      <>
-                        {' '}
-                        <span className="font-semibold text-blue-600">"{activity.title}"</span>
-                      </>
-                    )}
-                  </p>
-                  <p className="text-sm text-gray-500">{activity.time}</p>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5">{activity.time}</div>
                 </div>
               </div>
-              <button className="text-gray-400 hover:text-gray-600">
-                <MoreHorizontal className="w-5 h-5" />
-              </button>
             </div>
 
-            {/* Activity Content */}
-            {activity.image && (
-              <div className="ml-15 mt-3">
-                <div className="bg-gray-50 rounded-xl overflow-hidden">
+            {/* Content */}
+            <div className={`pl-13 ml-13 cursor-pointer`} onClick={() => navigate(`/article/${activity.id}`)}>
+              {activity.title && (
+                <div className="mb-3">
+                  <h3 className="font-bold text-gray-800 text-lg hover:text-[#004DA6] cursor-pointer transition-colors">
+                    {activity.title}
+                  </h3>
+                </div>
+              )}
+
+              {activity.excerpt && (
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                  {activity.excerpt}
+                </p>
+              )}
+
+              {activity.image && (
+                <div className="mb-4 rounded-lg overflow-hidden border border-gray-100">
                   <img
                     src={activity.image}
-                    alt={activity.title}
-                    className="w-full h-64 object-cover"
+                    alt="Content"
+                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
-                  {activity.excerpt && (
-                    <div className="p-4">
-                      <p className="text-gray-700 text-sm">{activity.excerpt}</p>
-                    </div>
-                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {activity.comment && (
-              <div className="ml-15 mt-3 bg-gray-50 rounded-xl p-4">
-                <p className="text-gray-700 text-sm italic">"{activity.comment}"</p>
-              </div>
-            )}
+              {activity.comment && (
+                <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-100 italic text-gray-700 text-sm">
+                  "{activity.comment}"
+                </div>
+              )}
 
-            {/* Engagement Stats */}
-            {(activity.likes || activity.comments || activity.shares) && (
-              <div className="ml-15 mt-4 flex items-center space-x-6 text-sm text-gray-600">
-                <div className="flex items-center space-x-2">
-                  <Heart className="w-4 h-4" />
+              {/* User Mock Comments if any (from our mock logic) */}
+              {activity.userComments && activity.userComments.map((c, i) => (
+                <div key={i} className="bg-blue-50/50 rounded-lg p-3 mb-2 text-sm">
+                  <span className="font-bold text-gray-800">{c.user}: </span>
+                  <span className="text-gray-700">{c.text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-2">
+              <div className="flex space-x-6">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleLike(activity.id); }}
+                  className={`flex items-center space-x-2 text-sm font-medium transition-colors ${activity.isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+                >
+                  <Heart className={`w-4 h-4 ${activity.isLiked ? 'fill-current' : ''}`} />
                   <span>{activity.likes}</span>
-                </div>
-                <div className="flex items-center space-x-2">
+                </button>
+
+                <button
+                  onClick={(e) => toggleCommentInput(activity.id, e)}
+                  className={`flex items-center space-x-2 text-sm font-medium transition-colors ${activeCommentId === activity.id ? 'text-[#004DA6]' : 'text-gray-500 hover:text-[#004DA6]'}`}
+                >
                   <MessageCircle className="w-4 h-4" />
                   <span>{activity.comments}</span>
-                </div>
-                <div className="flex items-center space-x-2">
+                </button>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleShare(activity.id); }}
+                  className="flex items-center space-x-2 text-sm font-medium text-gray-500 hover:text-[#004DA6] transition-colors"
+                >
                   <Share2 className="w-4 h-4" />
                   <span>{activity.shares}</span>
-                </div>
+                </button>
               </div>
-            )}
+            </div>
 
-            {/* Action Buttons for new articles */}
-            {activity.image && (
-              <div className="ml-15 mt-4 flex items-center space-x-3">
-                <button className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium">
-                  <Heart className="w-4 h-4" />
-                  <span>Like</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Comment</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                  <Share2 className="w-4 h-4" />
-                  <span>Share</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                  <Bookmark className="w-4 h-4" />
+            {/* Inline Comment Input */}
+            {activeCommentId === activity.id && (
+              <div className="mt-4 flex gap-2 animate-fadeIn">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                  onKeyDown={(e) => e.key === 'Enter' && submitComment(activity.id)}
+                />
+                <button
+                  onClick={() => submitComment(activity.id)}
+                  className="px-3 py-2 bg-[#004DA6] text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Post
                 </button>
               </div>
             )}
           </div>
         ))}
       </div>
-
-      {/* Load More */}
-      <div className="mt-8 text-center">
-        <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-          Load More Activities
-        </button>
-      </div>
-    </main>
+    </section>
   );
 }

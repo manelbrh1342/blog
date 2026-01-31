@@ -18,7 +18,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   avatar,
 }) => (
   <div className="bg-white rounded-xl mt-10 w-65 md:w-100">
-    <img src={image} alt={title} className="w-full object-cover rounded-lg" />
+    <img src={image} alt={title} className="w-full h-48 object-cover rounded-lg" />
     <div className="p-5">
       <h2 className="text-xl font-bold mb-2 text-left">{title}</h2>
       <p className="text-gray-400 text-left">{date}</p>

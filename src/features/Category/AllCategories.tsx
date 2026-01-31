@@ -175,8 +175,8 @@ const AllCategories: React.FC = () => {
               </p>
 
               <Link
-                to={`/articles/${cat.slug}`}
-                className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700 font-secondary inline-block"
+                to={`/category/${cat.slug}`}
+                className="bg-[#004aad] text-white text-sm px-4 py-2 rounded-md hover:bg-[#003d82] font-secondary inline-block"
               >
                 Browse
               </Link>

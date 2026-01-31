@@ -1,3 +1,5 @@
+import { mockCategories } from "../../data/mock";
+
 export interface Category {
   id: number;
   name: string;
@@ -8,44 +10,24 @@ export interface Category {
   updated_at: string;
 }
 
-const API_URL = "http://localhost:5004/api/categories";
-
 export const fetchCategories = async (): Promise<Category[]> => {
-  const response = await fetch(`${API_URL}/`);
-  if (!response.ok) throw new Error("Erreur lors du chargement des catégories");
-  return response.json();
+  return Promise.resolve(mockCategories);
 };
 
 export const fetchCategoryBySlug = async (slug: string): Promise<Category> => {
-  const response = await fetch(`${API_URL}/${slug}`);
-  if (!response.ok) throw new Error("Erreur lors du chargement de la catégorie");
-  return response.json();
+  const category = mockCategories.find((c) => c.slug === slug);
+  if (!category) throw new Error("Category not found");
+  return Promise.resolve(category);
 };
 
 export const createCategory = async (categoryData: Partial<Category>): Promise<{ message: string; id: number }> => {
-  const response = await fetch(`${API_URL}/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(categoryData),
-  });
-  if (!response.ok) throw new Error("Erreur lors de la création de la catégorie");
-  return response.json();
+  return Promise.resolve({ message: "Category created", id: 999 });
 };
 
 export const updateCategory = async (id: number, categoryData: Partial<Category>): Promise<{ message: string; id: number }> => {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(categoryData),
-  });
-  if (!response.ok) throw new Error("Erreur lors de la mise à jour de la catégorie");
-  return response.json();
+  return Promise.resolve({ message: "Category updated", id });
 };
 
 export const deleteCategory = async (id: number): Promise<{ message: string }> => {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Erreur lors de la suppression de la catégorie");
-  return response.json();
+  return Promise.resolve({ message: "Category deleted" });
 };

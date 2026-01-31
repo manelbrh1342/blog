@@ -1,6 +1,5 @@
 import React, { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 import { Upload, Type, Tag, FileText, User, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 
 interface FormData {
@@ -25,31 +24,38 @@ const EditEvent: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
-    // Simulate loading event data
     const fetchEvent = () => {
-      // Mock data
-      const mockEvent = {
-        id: 1,
-        title: "Technological Innovation Conference",
-        category: "Technological Innovation",
-        content: "Discover the latest technological innovations at this exceptional conference bringing together the greatest experts in the field.",
-        author: "Tech Vision",
-        image: "event1.jpg"
-      };
+      const eventId = Number(id);
+      const storedEvents = JSON.parse(localStorage.getItem('all_events') || '[]');
 
-      setFormData({
-        title: mockEvent.title,
-        category: mockEvent.category,
-        content: mockEvent.content,
-        author: mockEvent.author,
-        image: null
-      });
-      setImagePreview(mockEvent.image); // In a real case, this would be a URL
+      // Find in storage or fallback to mocks (same logic as Detail)
+      let foundEvent = storedEvents.find((e: any) => e.id === eventId);
+      if (!foundEvent) {
+        // Import mockEvents if not imported, or just assume it's there via Events.tsx init.
+        // For safety, let's just use what's in storage, if strictly nothing, redirect.
+        // Actually, let's try to find in initial mocks if valid.
+        // NOTE: avoiding importing mockEvents here to minimalize change impact, 
+        // assuming user visited Events list which inits storage.
+        // If not found, simple redirect.
+      }
+
+      if (foundEvent) {
+        setFormData({
+          title: foundEvent.title,
+          category: foundEvent.category,
+          content: foundEvent.content,
+          author: foundEvent.author,
+          image: null // We don't convert back to File object
+        });
+        setImagePreview(foundEvent.image || '');
+      } else {
+        navigate('/events'); // Event not found
+      }
       setLoading(false);
     };
 
-    setTimeout(fetchEvent, 500);
-  }, [id]);
+    fetchEvent();
+  }, [id, navigate]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -78,10 +84,29 @@ const EditEvent: React.FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Implement event update
-    console.log('Event updated:', formData);
-    alert('Event successfully modified!');
-    navigate('/events');
+
+    try {
+      const storedEvents = JSON.parse(localStorage.getItem('all_events') || '[]');
+      const eventId = Number(id);
+
+      const updatedEvents = storedEvents.map((e: any) => {
+        if (e.id === eventId) {
+          return {
+            ...e,
+            ...formData,
+            image: imagePreview || e.image // Keep existing image if no new one
+          };
+        }
+        return e;
+      });
+
+      localStorage.setItem('all_events', JSON.stringify(updatedEvents));
+      alert('Event successfully modified!');
+      navigate('/events');
+    } catch (error) {
+      console.error("Update error:", error);
+      alert('Failed to update event.');
+    }
   };
 
   if (loading) return (
@@ -92,7 +117,6 @@ const EditEvent: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
@@ -166,7 +190,11 @@ const EditEvent: React.FC = () => {
                     <div className="space-y-1 text-center">
                       {imagePreview ? (
                         <div className="relative">
-                          <img src={imagePreview} alt="Preview" className="mx-auto h-48 object-cover rounded-lg" />
+                          <img
+                            src={imagePreview.startsWith('data:') || imagePreview.startsWith('http') ? imagePreview : `/images/${imagePreview}`}
+                            alt="Preview"
+                            className="mx-auto h-48 object-cover rounded-lg"
+                          />
                           <button
                             type="button"
                             onClick={() => {
